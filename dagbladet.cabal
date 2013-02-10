@@ -4,11 +4,33 @@ version: 0.0.0
 cabal-version: >= 1.2
 build-type: Simple
 
+executable dagbladet
+  hs-source-dirs:
+      src
+
+  main-is: Main.hs
+
+  build-depends:
+      base
+    , bytestring
+    , text
+    , filepath
+    , directory
+    , tagsoup
+    , download
+
 library
   hs-source-dirs:
       src
 
   build-depends:
       base
+    , bytestring
+    , text
+    , filepath
+    , directory
+    , tagsoup
+    , download
 
   exposed-modules:
+      Dagbladet.Headline
