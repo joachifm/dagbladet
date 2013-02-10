@@ -1,0 +1,14 @@
+name: dagbladet
+version: 0.0.0
+
+cabal-version: >= 1.2
+build-type: Simple
+
+library
+  hs-source-dirs:
+      src
+
+  build-depends:
+      base
+
+  exposed-modules:
