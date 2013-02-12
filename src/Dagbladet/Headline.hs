@@ -14,6 +14,15 @@ data Headline = Headline
   , hText :: T.Text
   } deriving Show
 
+instance Eq Headline where
+  x == y = hText x == hText y
+
+instance Ord Headline where
+  x `compare` y =
+    case hPubDate x `compare` hPubDate y of
+      EQ -> hText x `compare` hText y
+      r  -> r
+
 ------------------------------------------------------------------------
 
 -- | Parse headlines from page source.
