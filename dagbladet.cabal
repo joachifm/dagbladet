@@ -18,6 +18,7 @@ executable dagbladet
     , directory
     , tagsoup
     , download
+    , SHA2
 
 library
   hs-source-dirs:
