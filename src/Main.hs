@@ -1,14 +1,17 @@
 module Main (main) where
 
-import Dagbladet.Headline
+import App.Config
+import App.Get
+import App.Build
 
-import Network.Download (openURI)
+import System.Environment (getArgs)
 
 ------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-  c <- openURI "http://www.dagbladet.no"
-  case c of
-    Left e  -> fail e
-    Right r -> print (parseHeadlines r)
+  args <- getArgs
+  let conf = defaultConfig
+  case args of
+    ("get":_)   -> get conf
+    ("build":_) -> build conf
