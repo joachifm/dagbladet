@@ -36,10 +36,7 @@ main = forever $ do
   writeLastTime
 
 -- How many seconds until next fetch?
-getNextTime = do
-  now <- getCurrentTime
-  lastTime <- getLastTime
-  return $ nextTime lastTime now
+getNextTime = nextTime <$> getLastTime <*> getCurrentTime
 
 nextTime t0 t1 = norm $ round (minTimeDiff - diff)
   where
