@@ -13,8 +13,8 @@ module Main (main) where
 import qualified Data.ByteString.Char8 as SB
 
 import Control.Applicative
-import Control.Monad (forever, unless, void)
-import System.Posix.Unistd (sleep)
+import Control.Monad (forever, unless)
+import Control.Concurrent (threadDelay)
 import System.Process (system)
 import System.Directory (doesFileExist)
 
@@ -30,10 +30,13 @@ import Data.Time.Calendar
 main = forever $ do
   firstTime <- isFirstTime
   unless firstTime $ do
-    nsecs <- getNextTime
-    void (sleep nsecs)
+    sleep =<< getNextTime
   system "./dagbladet get"
   writeLastTime
+
+-- Like posix sleep
+sleep :: Int -> IO ()
+sleep secs = threadDelay (secs * 1000000)
 
 -- How many seconds until next fetch?
 getNextTime = nextTime <$> getLastTime <*> getCurrentTime
