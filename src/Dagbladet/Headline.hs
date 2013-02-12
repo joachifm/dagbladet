@@ -37,11 +37,18 @@ fromA x =
   let url = attr "href" x
   in Headline { hPubDate = parseUrlDate url
               , hUrl = url
-              , hText = attr "title" x
+              , hText = onespace (attr "title" x)
               }
 
+-- Extract attribute value as a properly encoded 'Text' value.
 attr :: String -> Tag B.ByteString -> T.Text
 attr x = decodeLatin1 . fromAttrib (B.pack x)
+
+------------------------------------------------------------------------
+
+-- Replace all whitespace with a single space (also removes trailing whitespace).
+onespace :: T.Text -> T.Text
+onespace = T.unwords . T.words
 
 ------------------------------------------------------------------------
 
