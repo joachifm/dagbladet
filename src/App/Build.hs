@@ -3,6 +3,7 @@ module App.Build (build) where
 import App.Config
 import Dagbladet.Headline
 
+import Control.Applicative
 import Data.List (nub, sort)
 
 import qualified Data.ByteString as SB
@@ -16,17 +17,21 @@ import System.FilePath
 
 -- | Scan cached source and build a corpus of headlines.
 build :: AppConfig -> IO ()
-build cfg = do
-  cs <- mapM SB.readFile =<< getChildren (appCacheDir cfg)
-  let dest = appDataDir cfg </> "corpus"
-      hl = sort . nub . concatMap parseHeadlines $ cs
-      ot = fmt hl
-  T.writeFile dest ot
+build cfg =
+  getHeadlines (appCacheDir cfg) >>=
+  writeHeadlines (appDataDir cfg </> "corpus")
 
 ------------------------------------------------------------------------
 
-fmt :: [Headline] -> T.Text
-fmt = T.unlines . map fmt1
+getHeadlines :: FilePath -> IO [Headline]
+getHeadlines rootDir =
+  concatMap parseHeadlines <$> (mapM SB.readFile =<< getChildren rootDir)
+
+writeHeadlines :: FilePath -> [Headline] -> IO ()
+writeHeadlines fileName =
+  T.writeFile fileName . T.unlines . map fmt1 . sort . nub
+
+------------------------------------------------------------------------
 
 fmt1 :: Headline -> T.Text
 fmt1 x = record [ hPubDate x, hUrl x, hText x ]
