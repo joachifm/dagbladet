@@ -30,9 +30,15 @@ import Data.Time.Calendar
 main = forever $ do
   firstTime <- isFirstTime
   unless firstTime $ do
+    logConsole "Waiting ..."
     sleep =<< getNextTime
+  logConsole "Getting ..."
   system "./dagbladet get"
   writeLastTime
+
+logConsole msg = do
+  now <- getCurrentTime
+  print now >> putStrLn msg
 
 -- Like posix sleep
 sleep :: Int -> IO ()
