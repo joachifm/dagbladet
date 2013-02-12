@@ -34,3 +34,6 @@ library
 
   exposed-modules:
       Dagbladet.Headline
+
+  other-modules:
+      App.Config
