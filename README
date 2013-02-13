@@ -1,0 +1,16 @@
+# About
+
+A dumb headline generator for dagbladet.no.
+
+# Usage
+
+     $ ./dagbladet get
+     $ ./dagbladet build
+     $ ./dagbladet gen
+     Regjeringspartiet ber om «iscenesettelse av en høy grad av moralsk bevissthet
+     Ap-statsråder tar seg ikke tid til å kysse ham. Nå er han anmeldt for MGP-sang
+     Mener kongefamilien burde brukt en sultan for å feire pavens avgang
+     Erna tar grep for å feire pavens avgang
+     Obama truer med å rense kirka for synd
+
+Run `get` at regular intervals to build up a corpus of headlines.
