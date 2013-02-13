@@ -27,7 +27,7 @@ instance Ord Headline where
 
 -- | Parse headlines from page source.
 parseHeadlines :: B.ByteString -> [Headline]
-parseHeadlines = map fromA . headlineTags . parseTags
+parseHeadlines = map fromA . headlineAnchors . parseTags
 
 ------------------------------------------------------------------------
 
@@ -60,10 +60,10 @@ parseUrlDate = T.init . T.takeWhile (not . isLetter)
 ------------------------------------------------------------------------
 
 -- Extract headline anchors from a soup of tags.
-headlineTags :: [Tag B.ByteString] -> [Tag B.ByteString]
-headlineTags = map f . sections (~== "<h2>")
-             . takeWhile (~/= "<style type='text/css'>")
-             . dropWhile (~/= "<div id='content'>")
+headlineAnchors :: [Tag B.ByteString] -> [Tag B.ByteString]
+headlineAnchors = map f . sections (~== "<h2>")
+                . takeWhile (~/= "<style type='text/css'>")
+                . dropWhile (~/= "<div id='content'>")
   where
     f x = sections (~== "<a>") x !! 0 !! 0
 
