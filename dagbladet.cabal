@@ -39,3 +39,6 @@ library
 
   other-modules:
       App.Config
+    , App.Get
+    , App.Build
+    , App.Gen
