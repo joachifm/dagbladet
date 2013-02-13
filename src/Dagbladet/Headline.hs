@@ -14,11 +14,20 @@ data Headline = Headline
   , hText :: T.Text
   } deriving Show
 
+instance Eq Headline where
+  x == y = hText x == hText y
+
+instance Ord Headline where
+  x `compare` y =
+    case hPubDate x `compare` hPubDate y of
+      EQ -> hText x `compare` hText y
+      r  -> r
+
 ------------------------------------------------------------------------
 
 -- | Parse headlines from page source.
 parseHeadlines :: B.ByteString -> [Headline]
-parseHeadlines = map fromA . headlineTags . parseTags
+parseHeadlines = map fromA . headlineAnchors . parseTags
 
 ------------------------------------------------------------------------
 
@@ -28,11 +37,18 @@ fromA x =
   let url = attr "href" x
   in Headline { hPubDate = parseUrlDate url
               , hUrl = url
-              , hText = attr "title" x
+              , hText = onespace (attr "title" x)
               }
 
+-- Extract attribute value as a properly encoded 'Text' value.
 attr :: String -> Tag B.ByteString -> T.Text
 attr x = decodeLatin1 . fromAttrib (B.pack x)
+
+------------------------------------------------------------------------
+
+-- Replace all whitespace with a single space (also removes trailing whitespace).
+onespace :: T.Text -> T.Text
+onespace = T.unwords . T.words
 
 ------------------------------------------------------------------------
 
@@ -44,10 +60,10 @@ parseUrlDate = T.init . T.takeWhile (not . isLetter)
 ------------------------------------------------------------------------
 
 -- Extract headline anchors from a soup of tags.
-headlineTags :: [Tag B.ByteString] -> [Tag B.ByteString]
-headlineTags = map f . sections (~== "<h2>")
-             . takeWhile (~/= "<style type='text/css'>")
-             . dropWhile (~/= "<div id='content'>")
+headlineAnchors :: [Tag B.ByteString] -> [Tag B.ByteString]
+headlineAnchors = map f . sections (~== "<h2>")
+                . takeWhile (~/= "<style type='text/css'>")
+                . dropWhile (~/= "<div id='content'>")
   where
     f x = sections (~== "<a>") x !! 0 !! 0
 
