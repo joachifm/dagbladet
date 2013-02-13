@@ -19,6 +19,8 @@ executable dagbladet
     , tagsoup
     , download
     , SHA2
+    , markov-chain
+    , random
 
 library
   hs-source-dirs:
