@@ -2,8 +2,10 @@ module App.Get (get) where
 
 import           App.Config
 
-import qualified Data.ByteString      as SB
-import qualified Codec.Digest.SHA     as SHA
+import qualified Data.ByteString        as SB
+import qualified Data.ByteString.Lazy   as LB
+import qualified Codec.Compression.GZip as GZip
+import qualified Codec.Digest.SHA       as SHA
 import           Codec.Digest.SHA (Length(..))
 import           System.FilePath
 import           Network.Download (openURI)
@@ -19,4 +21,4 @@ get cfg = do
     Right r -> do
       let name = SHA.showBSasHex $ SHA.hash SHA256 r
           dest = appCacheDir cfg </> name
-      SB.writeFile dest r
+      LB.writeFile dest (GZip.compress $ LB.fromStrict r)

@@ -6,7 +6,9 @@ import Dagbladet.Headline
 import Control.Applicative
 import Data.List (nub, sort)
 
+import qualified Codec.Compression.GZip as GZip
 import qualified Data.ByteString as SB
+import qualified Data.ByteString.Lazy as LB
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
@@ -25,7 +27,11 @@ build cfg =
 
 getHeadlines :: FilePath -> IO [Headline]
 getHeadlines rootDir =
-  concatMap parseHeadlines <$> (mapM SB.readFile =<< getChildren rootDir)
+  concatMap parseHeadlines <$> (mapM readCached =<< getChildren rootDir)
+
+readCached :: FilePath -> IO SB.ByteString
+readCached fileName = strictify . GZip.decompress <$> LB.readFile fileName
+  where strictify = SB.concat . LB.toChunks
 
 writeHeadlines :: FilePath -> [Headline] -> IO ()
 writeHeadlines fileName =
