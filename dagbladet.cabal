@@ -53,6 +53,7 @@ test-suite specs
   main-is: Main.hs
   hs-source-dirs: src tests
   ghc-options: -fno-warn-missing-signatures
+  cpp-options: -DTEST
 
   build-depends:
       base
