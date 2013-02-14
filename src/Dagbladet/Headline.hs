@@ -54,8 +54,11 @@ onespace = T.unwords . T.words
 
 -- Extract date portion from headline link.
 parseUrlDate :: T.Text -> T.Text
-parseUrlDate = T.init . T.takeWhile (not . isLetter)
+parseUrlDate = f . T.takeWhile (not . isLetter)
              . T.dropWhile (not . isDigit)
+  where
+    f x | T.null x  = T.empty
+        | otherwise = T.init x
 
 ------------------------------------------------------------------------
 
