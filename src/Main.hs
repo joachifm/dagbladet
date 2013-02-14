@@ -17,3 +17,4 @@ main = do
     ("get":_)   -> get conf
     ("build":_) -> build conf
     ("gen":_)   -> Gen.main conf
+    _           -> putStrLn "Usage: ./dagbladet {get|build|gen}"
