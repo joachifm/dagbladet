@@ -1,4 +1,12 @@
-module Dagbladet.Headline (Headline(..), parseHeadlines) where
+{-# LANGUAGE CPP #-}
+
+module Dagbladet.Headline
+  ( Headline(..)
+  , parseHeadlines
+#ifdef TEST
+  , parseUrlDate
+#endif
+  ) where
 
 import           Data.Char
 import qualified Data.Text                as T
