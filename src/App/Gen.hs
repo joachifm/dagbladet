@@ -31,9 +31,11 @@ genOpts = cmdArgsMode $ GenOpts
   { number = 10
            &= help "Number of headlines to print"
            &= typ "NUM"
+           &= groupname "Headline generation"
   , context = 2
             &= help "Prediction context"
             &= typ "NUM"
+            &= groupname "Headline generation"
   }
   &= summary "Generate random headlines"
   &= program "gen"
