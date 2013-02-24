@@ -43,4 +43,4 @@ gen opts xs g = take (number opts) . nub . noBoring
               . (\xs' -> runMulti (context opts) xs' 0 g)
               $ map T.words xs
   where
-    noBoring = filter (`notElem` xs)
+    noBoring = filter (\y -> not $ any (T.isPrefixOf y) xs)
