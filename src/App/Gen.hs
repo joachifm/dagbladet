@@ -7,17 +7,24 @@ import Data.List
 import Data.MarkovChain
 import System.Random
 
-import qualified Data.ByteString as SB
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 import System.FilePath
-import System.Directory
+
+------------------------------------------------------------------------
+
+data GenOpts = GenOpts
+  { number :: Int
+  , context :: Int
+  } deriving Show
 
 ------------------------------------------------------------------------
 
 main :: AppConfig -> IO ()
-main conf = T.putStr . T.unlines =<< (generateHeadlinesN 10 <$> getHeadlines conf <*> newStdGen)
+main conf = do
+  let opts = GenOpts 10 3
+  T.putStr . T.unlines =<< (gen opts <$> getHeadlines conf <*> newStdGen)
 
 ------------------------------------------------------------------------
 
@@ -30,9 +37,10 @@ extractHeadlines = map ((!! 2) . T.split (== ',')) . T.lines
 
 ------------------------------------------------------------------------
 
-generateHeadlinesN :: RandomGen g => Int -> [T.Text] -> g -> [T.Text]
-generateHeadlinesN n xs = take n . generateHeadlines xs
-
-generateHeadlines :: RandomGen g => [T.Text] -> g -> [T.Text]
-generateHeadlines xs =
-  nub . filter (`notElem` xs) . map T.unwords . runMulti 2 (map T.words xs) 0
+gen :: RandomGen g => GenOpts -> [T.Text] -> g -> [T.Text]
+gen opts xs g = take (number opts) . nub . noBoring
+              . map T.unwords
+              . (\xs' -> runMulti (context opts) xs' 0 g)
+              $ map T.words xs
+  where
+    noBoring = filter (`notElem` xs)
