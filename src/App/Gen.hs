@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
 module App.Gen where
 
 import App.Config
@@ -12,19 +14,36 @@ import qualified Data.Text.IO as T
 
 import System.FilePath
 
+import System.Environment
+import System.Console.CmdArgs
+
 ------------------------------------------------------------------------
 
 data GenOpts = GenOpts
   { number :: Int
   , context :: Int
-  } deriving Show
+  } deriving (Show, Data, Typeable)
+
+------------------------------------------------------------------------
+
+genOpts :: Mode (CmdArgs GenOpts)
+genOpts = cmdArgsMode $ GenOpts
+  { number = 10
+           &= help "Number of headlines to print"
+           &= typ "NUM"
+  }
+  &= summary "Generate random headlines"
+  &= program "gen"
 
 ------------------------------------------------------------------------
 
 main :: AppConfig -> IO ()
 main conf = do
-  let opts = GenOpts 10 3
+  opts <- subArgs (cmdArgsRun genOpts)
   T.putStr . T.unlines =<< (gen opts <$> getHeadlines conf <*> newStdGen)
+
+subArgs :: IO a -> IO a
+subArgs f = getArgs >>= \as -> withArgs (drop 1 as) f
 
 ------------------------------------------------------------------------
 
