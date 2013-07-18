@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
 module App.Gen where
 
 import App.Config
@@ -7,17 +9,46 @@ import Data.List
 import Data.MarkovChain
 import System.Random
 
-import qualified Data.ByteString as SB
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 import System.FilePath
-import System.Directory
+
+import System.Environment
+import System.Console.CmdArgs
+
+------------------------------------------------------------------------
+
+data GenOpts = GenOpts
+  { number :: Int
+  , context :: Int
+  } deriving (Show, Data, Typeable)
+
+------------------------------------------------------------------------
+
+genOpts :: Mode (CmdArgs GenOpts)
+genOpts = cmdArgsMode $ GenOpts
+  { number = 10
+           &= help "Number of headlines to print"
+           &= typ "NUM"
+           &= groupname "Headline generation"
+  , context = 2
+            &= help "Prediction context"
+            &= typ "NUM"
+            &= groupname "Headline generation"
+  }
+  &= summary "Generate random headlines"
+  &= program "gen"
 
 ------------------------------------------------------------------------
 
 main :: AppConfig -> IO ()
-main conf = T.putStr . T.unlines =<< (generateHeadlinesN 10 <$> getHeadlines conf <*> newStdGen)
+main conf = do
+  opts <- subArgs (cmdArgsRun genOpts)
+  T.putStr . T.unlines =<< (gen opts <$> getHeadlines conf <*> newStdGen)
+
+subArgs :: IO a -> IO a
+subArgs f = getArgs >>= \as -> withArgs (drop 1 as) f
 
 ------------------------------------------------------------------------
 
@@ -30,9 +61,10 @@ extractHeadlines = map ((!! 2) . T.split (== ',')) . T.lines
 
 ------------------------------------------------------------------------
 
-generateHeadlinesN :: RandomGen g => Int -> [T.Text] -> g -> [T.Text]
-generateHeadlinesN n xs = take n . generateHeadlines xs
-
-generateHeadlines :: RandomGen g => [T.Text] -> g -> [T.Text]
-generateHeadlines xs =
-  nub . filter (`notElem` xs) . map T.unwords . runMulti 2 (map T.words xs) 0
+gen :: RandomGen g => GenOpts -> [T.Text] -> g -> [T.Text]
+gen opts xs g = take (number opts) . nub . noBoring
+              . map T.unwords
+              . (\xs' -> runMulti (context opts) xs' 0 g)
+              $ map T.words xs
+  where
+    noBoring = filter (`notElem` xs)

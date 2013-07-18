@@ -24,6 +24,7 @@ executable dagbladet
     , SHA2
     , markov-chain
     , random
+    , cmdargs
 
 library
   hs-source-dirs:
